@@ -41,7 +41,7 @@ jobs:
           NDK_HOME: ${{ env.NDK_HOME }}
           ANDROID_NDK_HOME: ${{ env.ANDROID_NDK_HOME }}
       - name: Build Android APK
-        run: npx tauri android build --apk
+        run: npx tauri android build --apk --debug
         env:
           NDK_HOME: ${{ env.NDK_HOME }}
           ANDROID_NDK_HOME: ${{ env.ANDROID_NDK_HOME }}
