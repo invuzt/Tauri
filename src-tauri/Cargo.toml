@@ -1,19 +1,19 @@
 [package]
-name = "my-app"
-version = "0.1.0"
-description = "A Tauri App"
-authors = ["you"]
+name = "odfiz-app"
+version = "0.0.0"
+description = "Odfiz App"
+authors = []
 edition = "2021"
-rust-version = "1.70"
+
+[lib]
+name = "odfiz_app_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]
-tauri-build = { version = "1.5", features = [] }
+tauri-build = { version = "2", features = [] }
 
 [dependencies]
-serde_json = "1.0"
-serde = { version = "1.0", features = ["derive"] }
-tauri = { version = "1.5", features = [ "api-all"] }
-
-[features]
-default = [ "custom-protocol" ]
-custom-protocol = [ "tauri/custom-protocol" ]
+tauri = { version = "2", features = [] }
+tauri-plugin-shell = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
