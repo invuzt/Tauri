@@ -2,9 +2,9 @@
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "odfiz-app",
   "version": "0.1.0",
-  "identifier": "com.odfiz.app",
+  "identifier": "com.odfiz.myapp",
   "build": {
-    "frontendDist": "../"
+    "frontendDist": "../src"
   },
   "app": {
     "withGlobalTauri": true,
