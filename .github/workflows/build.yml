@@ -37,22 +37,29 @@ jobs:
       - run: npm install
       - name: Setup keystore
         run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > src-tauri/odfiz.keystore
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > /tmp/odfiz.keystore
       - name: Init Android project
         run: npx tauri android init
         env:
           NDK_HOME: ${{ env.NDK_HOME }}
           ANDROID_NDK_HOME: ${{ env.ANDROID_NDK_HOME }}
-      - name: Build & Sign APK
+      - name: Build APK
         run: npx tauri android build --apk --target aarch64
         env:
           NDK_HOME: ${{ env.NDK_HOME }}
           ANDROID_NDK_HOME: ${{ env.ANDROID_NDK_HOME }}
-          TAURI_SIGNING_ANDROID_KEYSTORE: ${{ github.workspace }}/src-tauri/odfiz.keystore
-          TAURI_SIGNING_ANDROID_KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          TAURI_SIGNING_ANDROID_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          TAURI_SIGNING_ANDROID_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+      - name: Sign APK
+        run: |
+          APK=$(find src-tauri/gen/android/app/build/outputs/apk -name "*.apk" | head -1)
+          echo "Signing: $APK"
+          $ANDROID_SDK_ROOT/build-tools/$(ls $ANDROID_SDK_ROOT/build-tools | tail -1)/apksigner sign \
+            --ks /tmp/odfiz.keystore \
+            --ks-pass pass:${{ secrets.KEYSTORE_PASSWORD }} \
+            --key-pass pass:${{ secrets.KEY_PASSWORD }} \
+            --ks-key-alias ${{ secrets.KEY_ALIAS }} \
+            --out app-signed.apk \
+            "$APK"
       - uses: actions/upload-artifact@v4
         with:
           name: apk-result
-          path: src-tauri/gen/android/app/build/outputs/apk/**/*.apk
+          path: app-signed.apk
