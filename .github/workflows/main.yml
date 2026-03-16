@@ -5,26 +5,32 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
           java-version: '17'
+
       - name: Setup Android NDK
         uses: nttld/setup-ndk@v1
         with:
           ndk-version: r25c
+
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
+
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: aarch64-linux-android
+
       - name: Build APK
         run: |
           npm install
           cd src-tauri
           cargo install cargo-ndk
-          cargo ndk -t aarch64-linux-android build --release
+          # Kuncinya ada di baris di bawah ini:
+          cargo ndk -t aarch64-linux-android build --release --no-default-features --features rustls
