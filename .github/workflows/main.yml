@@ -32,5 +32,5 @@ jobs:
           npm install
           cd src-tauri
           cargo install cargo-ndk
-          # Kuncinya ada di baris di bawah ini:
+          # Menggunakan rustls agar tidak butuh OpenSSL sistem
           cargo ndk -t aarch64-linux-android build --release --no-default-features --features rustls
