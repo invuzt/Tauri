@@ -33,7 +33,7 @@ jobs:
         run: |
           sudo apt-get install -y imagemagick
           mkdir -p src-tauri/icons
-          convert -size 512x512 xc:#1a1a2e src-tauri/icons/icon.png
+          convert -size 512x512 xc:#1a1a2e -alpha on -type TrueColorAlpha PNG32:src-tauri/icons/icon.png
       - run: npm install
       - name: Init Android project
         run: npx tauri android init
