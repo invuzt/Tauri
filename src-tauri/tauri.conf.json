@@ -13,14 +13,7 @@
   "bundle": {
     "active": true,
     "targets": "all",
-    "icon": [],
-    "android": {
-      "signingKey": {
-        "keystore": "/data/data/com.termux/files/home/cakru.keystore",
-        "keystorePassword": "$KEYSTORE_PASSWORD",
-        "keyAlias": "$KEY_ALIAS",
-        "keyPassword": "$KEY_PASSWORD"
-      }
+    "icon": []
     }
   }
 }
