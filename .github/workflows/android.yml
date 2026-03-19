@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build Android APK (Optimized)
 on:
   push:
     branches: [ main ]
@@ -20,8 +20,8 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      # --- FITUR CACHE MULAI DI SINI ---
-      - name: Cache Rust Dependencies
+      # --- OPTIMASI 1: CACHE RUST & CARGO ---
+      - name: Cache Rust
         uses: actions/cache@v4
         with:
           path: |
@@ -31,47 +31,52 @@ jobs:
             ~/.cargo/git/db/
             src-tauri/target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-
+          restore-keys: ${{ runner.os }}-cargo-
 
-      - name: Cache Node Modules
+      # --- OPTIMASI 2: CACHE NODE MODULES ---
+      - name: Cache Node.js modules
         uses: actions/cache@v4
         with:
           path: node_modules
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-      # --- FITUR CACHE SELESAI ---
+          restore-keys: ${{ runner.os }}-node-
 
-      - name: Install Rust
+      - name: Install Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: aarch64-linux-android
 
-      - name: Install Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 'lts/*'
-
-      - name: Install Dependencies
+      - name: Install Node Dependencies
         run: npm install
 
       - name: Build Android APK
         run: |
-          # Jangan hapus gen jika ingin cache lebih maksimal, 
-          # tapi tauri android init tetap butuh folder bersih kadang-kadang.
-          npx tauri android init
+          # Cek apakah folder gen sudah ada dari cache
+          if [ ! -d "src-tauri/gen/android" ]; then
+            echo "Inisialisasi Android Project baru..."
+            npx tauri android init
+          fi
+
+          # OPTIMASI 3: AUTO INJECT PERMISSIONS (Anti Ribet)
+          MANIFES="src-tauri/gen/android/app/src/main/AndroidManifest.xml"
+          if [ -f "$MANIFES" ]; then
+            echo "Menambahkan izin Storage ke Manifest..."
+            # Menambah izin sebelum tag <application
+            sed -i '/<application/i \    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>\n    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>\n    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>' $MANIFES
+          fi
+
+          # Build khusus arsitektur HP kamu biar cepat
           npx tauri android build --debug --apk --target aarch64
         env:
           NDK_HOME: ${{ env.ANDROID_NDK_HOME }}
 
-      - name: Find and Move APK
+      - name: Collect APK
         run: |
           mkdir -p outputs
           find src-tauri/gen/android -name "*-debug.apk" -exec cp {} outputs/ \;
 
-      - name: Upload APK
+      - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: odfiz-tool-debug
+          name: odfiz-tool-optimized
           path: outputs/*.apk
