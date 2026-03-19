@@ -3,53 +3,66 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Odfiz Zip Pro</title>
+  <title>Odfiz Zip Engine</title>
   <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;700&display=swap" rel="stylesheet" />
   <style>
     :root { --md-primary: #006495; --md-surface: #f5fafd; }
     body { font-family: 'Google Sans', sans-serif; background: var(--md-surface); padding: 20px; text-align: center; }
-    .card { background: white; border-radius: 28px; padding: 30px; border: 1px solid #c1c7ce; }
-    button { width: 100%; padding: 18px; border-radius: 50px; border: none; background: var(--md-primary); color: white; font-weight: 700; margin-top: 10px; }
-    #status { margin-top: 20px; font-size: 13px; color: #555; word-break: break-all; }
+    .card { background: white; border-radius: 28px; padding: 30px; border: 1px solid #c1c7ce; margin-top: 20px; }
+    .btn-outline { width: 100%; padding: 15px; border-radius: 15px; border: 2px solid var(--md-primary); background: transparent; color: var(--md-primary); font-weight: 700; margin-bottom: 10px; cursor: pointer; }
+    .btn-filled { width: 100%; padding: 18px; border-radius: 50px; border: none; background: var(--md-primary); color: white; font-weight: 700; margin-top: 20px; display: none; cursor: pointer; }
+    #status { margin-top: 20px; font-size: 13px; color: #555; word-break: break-all; font-weight: bold; }
+    .info { font-size: 12px; color: #777; margin-bottom: 20px; }
   </style>
 </head>
 <body>
-  <div style="font-size: 50px;">📦</div>
-  <h2>Odfiz Professional Zip</h2>
+  <div style="font-size: 60px; margin-top: 20px;">📦</div>
+  <h2 style="margin-bottom: 5px;">Odfiz Zip Pro</h2>
+  <p class="info">Powered by Rust Engine</p>
+
   <div class="card">
-    <p id="pathDisplay">Belum ada file dipilih</p>
-    <button onclick="pilihFile()">PILIH FILE</button>
-    <button id="btnKompres" onclick="mulaiKompres()" style="display:none; background:#004a6f;">MULAI KOMPRESI</button>
-    <div id="status"></div>
+    <button class="btn-outline" onclick="pilih(false)">📄 PILIH FILE</button>
+    <button class="btn-outline" onclick="pilih(true)">📁 PILIH FOLDER</button>
+    
+    <div id="targetInfo" style="margin-top:15px; font-size:13px; color:#006495;"></div>
+    
+    <button id="btnAction" class="btn-filled" onclick="eksekusi()">KOMPRES SEKARANG</button>
+    <div id="status">Siap beraksi...</div>
   </div>
 
   <script>
     const { invoke } = window.__TAURI__.core;
     const { open } = window.__TAURI__.dialog;
     let selectedPath = null;
+    let isFolder = false;
 
-    async function pilihFile() {
+    async function pilih(folderMode) {
       try {
-        // Membuka file picker asli Android via Tauri
         const selected = await open({
           multiple: false,
-          directory: false,
+          directory: folderMode,
         });
+        
         if (selected) {
           selectedPath = selected;
-          document.getElementById('pathDisplay').innerText = "Target: " + selected;
-          document.getElementById('btnKompres').style.display = 'block';
+          isFolder = folderMode;
+          document.getElementById('targetInfo').innerText = "Target: " + selected;
+          document.getElementById('btnAction').style.display = 'block';
+          document.getElementById('status').innerText = "Target terkunci. Klik tombol di atas.";
         }
       } catch (e) {
-        alert("Gagal membuka file picker: " + e);
+        alert("Gagal mengakses storage: " + e);
       }
     }
 
-    async function mulaiKompres() {
+    async function eksekusi() {
       const status = document.getElementById('status');
-      status.innerText = "⚡ Mesin Rust sedang bekerja...";
+      status.innerText = "⚡ Rust sedang bekerja keras...";
+      
+      const cmd = isFolder ? 'kompres_folder_asli' : 'kompres_file_asli';
+      
       try {
-        const res = await invoke('kompres_file_asli', { inputPath: selectedPath });
+        const res = await invoke(cmd, { inputPath: selectedPath });
         status.innerText = "✅ " + res;
       } catch (e) {
         status.innerText = "❌ Error: " + e;
