@@ -4,28 +4,42 @@ use std::path::Path;
 use zip::write::FileOptions;
 use walkdir::WalkDir;
 
+fn get_output_path(input_path: &str) -> String {
+    // Arahkan ke folder Download standar Android
+    let download_dir = "/sdcard/Download/OdfizZip";
+    let _ = fs::create_dir_all(download_dir); // Buat folder jika belum ada
+    
+    let path = Path::new(input_path);
+    let file_name = path.file_name().unwrap().to_string_lossy();
+    format!("{}/{}.zip", download_dir, file_name)
+}
+
 #[tauri::command]
 async fn kompres_file_asli(input_path: String) -> Result<String, String> {
     let path = Path::new(&input_path);
     if !path.exists() { return Err("File tidak ditemukan!".into()); }
-    let output_path = format!("{}.zip", input_path);
+    
+    let output_path = get_output_path(&input_path);
     let file = File::create(&output_path).map_err(|e| e.to_string())?;
     let mut zip = zip::ZipWriter::new(file);
     let options = FileOptions::default().compression_method(zip::CompressionMethod::Deflated).unix_permissions(0o755);
+    
     zip.start_file(path.file_name().unwrap().to_string_lossy(), options).map_err(|e| e.to_string())?;
     let mut f = File::open(path).map_err(|e| e.to_string())?;
     let mut buffer = Vec::new();
     f.read_to_end(&mut buffer).map_err(|e| e.to_string())?;
     zip.write_all(&buffer).map_err(|e| e.to_string())?;
     zip.finish().map_err(|e| e.to_string())?;
-    Ok(format!("File dikompres ke: {}", output_path))
+    
+    Ok(format!("Berhasil! Cek di: {}", output_path))
 }
 
 #[tauri::command]
 async fn kompres_folder_asli(input_path: String) -> Result<String, String> {
     let path = Path::new(&input_path);
     if !path.exists() { return Err("Folder tidak ditemukan!".into()); }
-    let output_path = format!("{}.zip", input_path);
+    
+    let output_path = get_output_path(&input_path);
     let file = File::create(&output_path).map_err(|e| e.to_string())?;
     let mut zip = zip::ZipWriter::new(file);
     let options = FileOptions::default().compression_method(zip::CompressionMethod::Deflated).unix_permissions(0o755);
@@ -44,7 +58,7 @@ async fn kompres_folder_asli(input_path: String) -> Result<String, String> {
         }
     }
     zip.finish().map_err(|e| e.to_string())?;
-    Ok(format!("Folder dikompres ke: {}", output_path))
+    Ok(format!("Berhasil! Folder dikompres ke: {}", output_path))
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
