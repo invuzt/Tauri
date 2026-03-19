@@ -5,10 +5,8 @@ use zip::write::FileOptions;
 use walkdir::WalkDir;
 
 fn get_output_path(input_path: &str) -> String {
-    // Arahkan ke folder Download standar Android
     let download_dir = "/sdcard/Download/OdfizZip";
-    let _ = fs::create_dir_all(download_dir); // Buat folder jika belum ada
-    
+    let _ = fs::create_dir_all(download_dir);
     let path = Path::new(input_path);
     let file_name = path.file_name().unwrap().to_string_lossy();
     format!("{}/{}.zip", download_dir, file_name)
@@ -18,19 +16,16 @@ fn get_output_path(input_path: &str) -> String {
 async fn kompres_file_asli(input_path: String) -> Result<String, String> {
     let path = Path::new(&input_path);
     if !path.exists() { return Err("File tidak ditemukan!".into()); }
-    
     let output_path = get_output_path(&input_path);
     let file = File::create(&output_path).map_err(|e| e.to_string())?;
     let mut zip = zip::ZipWriter::new(file);
     let options = FileOptions::default().compression_method(zip::CompressionMethod::Deflated).unix_permissions(0o755);
-    
     zip.start_file(path.file_name().unwrap().to_string_lossy(), options).map_err(|e| e.to_string())?;
     let mut f = File::open(path).map_err(|e| e.to_string())?;
     let mut buffer = Vec::new();
     f.read_to_end(&mut buffer).map_err(|e| e.to_string())?;
     zip.write_all(&buffer).map_err(|e| e.to_string())?;
     zip.finish().map_err(|e| e.to_string())?;
-    
     Ok(format!("Berhasil! Cek di: {}", output_path))
 }
 
@@ -38,12 +33,10 @@ async fn kompres_file_asli(input_path: String) -> Result<String, String> {
 async fn kompres_folder_asli(input_path: String) -> Result<String, String> {
     let path = Path::new(&input_path);
     if !path.exists() { return Err("Folder tidak ditemukan!".into()); }
-    
     let output_path = get_output_path(&input_path);
     let file = File::create(&output_path).map_err(|e| e.to_string())?;
     let mut zip = zip::ZipWriter::new(file);
     let options = FileOptions::default().compression_method(zip::CompressionMethod::Deflated).unix_permissions(0o755);
-
     for entry in WalkDir::new(path).into_iter().filter_map(|e| e.ok()) {
         let entry_path = entry.path();
         let name = entry_path.strip_prefix(path).map_err(|e| e.to_string())?;
@@ -64,6 +57,8 @@ async fn kompres_folder_asli(input_path: String) -> Result<String, String> {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_fs::init())
+        .plugin(tauri_plugin_dialog::init())
         .invoke_handler(tauri::generate_handler![kompres_file_asli, kompres_folder_asli])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -7,38 +7,40 @@
   <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;700&display=swap" rel="stylesheet" />
   <style>
     :root { --md-primary: #006495; --md-surface: #f5fafd; }
-    body { font-family: 'Google Sans', sans-serif; background: var(--md-surface); padding: 20px; text-align: center; }
-    .card { background: white; border-radius: 28px; padding: 30px; border: 1px solid #c1c7ce; margin-top: 20px; }
-    .btn-outline { width: 100%; padding: 15px; border-radius: 15px; border: 2px solid var(--md-primary); background: transparent; color: var(--md-primary); font-weight: 700; margin-bottom: 10px; cursor: pointer; }
+    body { font-family: 'Google Sans', sans-serif; background: var(--md-surface); padding: 20px; text-align: center; color: #1a1c1e; }
+    .card { background: white; border-radius: 28px; padding: 30px; border: 1px solid #c1c7ce; margin-top: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    .btn-outline { width: 100%; padding: 15px; border-radius: 15px; border: 2px solid var(--md-primary); background: transparent; color: var(--md-primary); font-weight: 700; margin-bottom: 10px; cursor: pointer; transition: 0.2s; }
     .btn-filled { width: 100%; padding: 18px; border-radius: 50px; border: none; background: var(--md-primary); color: white; font-weight: 700; margin-top: 20px; display: none; cursor: pointer; }
-    #status { margin-top: 20px; font-size: 13px; color: #555; word-break: break-all; font-weight: bold; }
-    .info { font-size: 12px; color: #777; margin-bottom: 20px; }
+    #status { margin-top: 20px; font-size: 13px; color: #444; word-break: break-all; min-height: 40px; }
+    #targetInfo { margin-top: 15px; font-size: 13px; color: #006495; font-style: italic; }
   </style>
 </head>
 <body>
   <div style="font-size: 60px; margin-top: 20px;">📦</div>
   <h2 style="margin-bottom: 5px;">Odfiz Zip Pro</h2>
-  <p class="info">Powered by Rust Engine</p>
+  <p style="font-size: 12px; color: #777;">Tauri 2.0 Rust Engine</p>
 
   <div class="card">
     <button class="btn-outline" onclick="pilih(false)">📄 PILIH FILE</button>
     <button class="btn-outline" onclick="pilih(true)">📁 PILIH FOLDER</button>
     
-    <div id="targetInfo" style="margin-top:15px; font-size:13px; color:#006495;"></div>
+    <div id="targetInfo">Belum ada target dipilih</div>
     
     <button id="btnAction" class="btn-filled" onclick="eksekusi()">KOMPRES SEKARANG</button>
-    <div id="status">Siap beraksi...</div>
+    <div id="status">Siap digunakan</div>
   </div>
 
   <script>
+    // Memanggil API core dan plugin Tauri 2.0
     const { invoke } = window.__TAURI__.core;
-    const { open } = window.__TAURI__.dialog;
+    const dialog = window.__TAURI__.dialog;
+
     let selectedPath = null;
     let isFolder = false;
 
     async function pilih(folderMode) {
       try {
-        const selected = await open({
+        const selected = await dialog.open({
           multiple: false,
           directory: folderMode,
         });
@@ -48,24 +50,32 @@
           isFolder = folderMode;
           document.getElementById('targetInfo').innerText = "Target: " + selected;
           document.getElementById('btnAction').style.display = 'block';
-          document.getElementById('status').innerText = "Target terkunci. Klik tombol di atas.";
+          document.getElementById('status').innerText = "Target terkunci. Klik tombol di bawah.";
         }
       } catch (e) {
-        alert("Gagal mengakses storage: " + e);
+        console.error(e);
+        alert("Gagal membuka pemilih: " + e);
       }
     }
 
     async function eksekusi() {
       const status = document.getElementById('status');
-      status.innerText = "⚡ Rust sedang bekerja keras...";
+      const btn = document.getElementById('btnAction');
+      
+      status.innerText = "⚡ Sedang memproses... Tunggu sebentar.";
+      btn.disabled = true;
+      btn.style.opacity = "0.5";
       
       const cmd = isFolder ? 'kompres_folder_asli' : 'kompres_file_asli';
       
       try {
         const res = await invoke(cmd, { inputPath: selectedPath });
-        status.innerText = "✅ " + res;
+        status.innerHTML = "<b style='color:green;'>✅ " + res + "</b>";
       } catch (e) {
-        status.innerText = "❌ Error: " + e;
+        status.innerHTML = "<b style='color:red;'>❌ Error: " + e + "</b>";
+      } finally {
+        btn.disabled = false;
+        btn.style.opacity = "1";
       }
     }
   </script>
