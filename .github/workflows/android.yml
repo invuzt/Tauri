@@ -1,0 +1,52 @@
+name: Build Android APK
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolcache@stable
+        with:
+          targets: aarch64-linux-android
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Clean and Init Android
+        # Ini kunci perbaikannya: Hapus gen lama agar identifier baru bisa diterapkan
+        run: |
+          rm -rf src-tauri/gen
+          npx tauri android init
+
+      - name: Build Android APK
+        run: npx tauri android build --apk --target aarch64
+        env:
+          NDK_HOME: ${{ env.ANDROID_NDK_HOME }}
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: odfiz-tool-debug-apk
+          path: src-tauri/gen/android/app/build/outputs/apk/debug/*.apk
