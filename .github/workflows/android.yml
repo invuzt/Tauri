@@ -50,6 +50,7 @@ jobs:
       - name: Build Android APK
         run: |
           # Logika pengecekan folder Java agar tidak error Identifier Mismatch
+          # Kita cek apakah folder package 'com.odfiz.tool' ada
           if [ -d "src-tauri/gen/android" ]; then
             echo "Memeriksa integritas folder project..."
             if [ ! -d "src-tauri/gen/android/app/src/main/java/com/odfiz/tool" ]; then
