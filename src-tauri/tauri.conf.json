@@ -1,14 +1,21 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "cakru",
-  "version": "0.1.0",
-  "identifier": "com.odfiz.cakru",
+  "productName": "OdfizTool",
+  "version": "1.0.0",
+  "identifier": "com.odfiz.tool",
   "build": {
     "frontendDist": "../src"
   },
   "app": {
     "withGlobalTauri": true,
-    "windows": [{"title": "Cakru App", "width": 800, "height": 600}]
+    "windows": [
+      {
+        "title": "Odfiz Tool",
+        "width": 450,
+        "height": 700,
+        "resizable": true
+      }
+    ]
   },
   "bundle": {
     "active": true,

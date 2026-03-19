@@ -2,763 +2,129 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Odfiz App</title>
-  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Google+Sans+Display:wght@400;700&display=swap" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Odfiz Tool</title>
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
   <style>
     :root {
       --md-primary: #006495;
       --md-on-primary: #ffffff;
-      --md-primary-container: #cce5ff;
-      --md-on-primary-container: #001e30;
-      --md-secondary: #4f616e;
-      --md-secondary-container: #d2e5f5;
       --md-surface: #f5fafd;
-      --md-surface-variant: #dde3ea;
       --md-on-surface: #171c1f;
-      --md-on-surface-variant: #41484d;
-      --md-background: #f5fafd;
-      --md-outline: #71787d;
       --md-outline-variant: #c1c7ce;
-      --md-shadow: rgba(0,0,0,0.12);
-      --md-elevation-1: 0 1px 2px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.06);
-      --md-elevation-2: 0 1px 2px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.10);
-      --md-elevation-3: 0 4px 8px rgba(0,0,0,0.10), 0 2px 12px rgba(0,0,0,0.08);
-      --md-nav-height: 80px;
-      --md-status-bar: env(safe-area-inset-top, 0px);
-      --md-radius-s: 8px;
-      --md-radius-m: 16px;
-      --md-radius-l: 24px;
       --md-radius-xl: 28px;
     }
-
     @media (prefers-color-scheme: dark) {
       :root {
         --md-primary: #90ceff;
         --md-on-primary: #00344f;
-        --md-primary-container: #004c71;
-        --md-on-primary-container: #cce5ff;
-        --md-secondary: #b6c9d8;
-        --md-secondary-container: #37494f; /* fixed from 384955 */
         --md-surface: #0f1416;
-        --md-surface-variant: #41484d;
         --md-on-surface: #dde3e9;
-        --md-on-surface-variant: #c1c7ce;
-        --md-background: #0f1416;
-        --md-outline: #8b9198;
-        --md-outline-variant: #41484d;
-        --md-shadow: rgba(0,0,0,0.4);
-        --md-elevation-1: 0 1px 2px rgba(0,0,0,0.3), 0 2px 6px rgba(0,0,0,0.2);
-        --md-elevation-2: 0 1px 2px rgba(0,0,0,0.3), 0 2px 8px rgba(0,0,0,0.3);
-        --md-elevation-3: 0 4px 8px rgba(0,0,0,0.3), 0 2px 12px rgba(0,0,0,0.2);
       }
     }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Google Sans', sans-serif; }
+    body { background: var(--md-surface); color: var(--md-on-surface); padding: 20px; min-height: 100vh; }
+    
+    .app-header { margin-bottom: 24px; text-align: center; padding-top: 20px; }
+    .app-title { font-size: 24px; font-weight: 700; color: var(--md-primary); }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-    body {
-      font-family: 'Google Sans', sans-serif;
-      background: var(--md-background);
-      color: var(--md-on-surface);
-      min-height: 100vh;
-      overflow-x: hidden;
-      padding-top: var(--md-status-bar);
-    }
-
-    /* ── APP BAR ── */
-    .app-bar {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      padding: 16px 16px 8px;
-      background: var(--md-background);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .app-bar-title {
-      font-family: 'Google Sans Display', sans-serif;
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--md-on-surface);
-      letter-spacing: -0.3px;
-    }
-
-    .app-bar-actions {
-      display: flex;
-      gap: 4px;
-    }
-
-    .icon-btn {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      border: none;
-      background: transparent;
-      color: var(--md-on-surface-variant);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.2s;
-      font-size: 20px;
-    }
-
-    .icon-btn:active { background: var(--md-surface-variant); }
-
-    /* ── PAGES ── */
-    .pages { position: relative; }
-
-    .page {
-      display: none;
-      padding: 8px 16px calc(var(--md-nav-height) + 16px);
-      animation: pageIn 0.3s cubic-bezier(0.2, 0, 0, 1);
-      min-height: calc(100vh - 60px);
-    }
-
-    .page.active { display: block; }
-
-    @keyframes pageIn {
-      from { opacity: 0; transform: translateY(12px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    /* ── GREETING CARD ── */
-    .greeting-card {
-      background: linear-gradient(135deg, var(--md-primary), var(--md-primary-container));
+    .main-card {
+      background: var(--md-surface);
+      border: 1px solid var(--md-outline-variant);
       border-radius: var(--md-radius-xl);
       padding: 24px;
-      margin-bottom: 20px;
-      position: relative;
-      overflow: hidden;
-      box-shadow: var(--md-elevation-2);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
 
-    .greeting-card::before {
-      content: '';
-      position: absolute;
-      top: -40px; right: -40px;
-      width: 160px; height: 160px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.08);
-    }
-
-    .greeting-card::after {
-      content: '';
-      position: absolute;
-      bottom: -60px; left: -20px;
-      width: 200px; height: 200px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.05);
-    }
-
-    .greeting-time {
-      font-size: 13px;
-      color: var(--md-on-primary);
-      opacity: 0.8;
-      margin-bottom: 4px;
-    }
-
-    .greeting-text {
-      font-family: 'Google Sans Display', sans-serif;
-      font-size: 26px;
-      font-weight: 700;
-      color: var(--md-on-primary);
-      line-height: 1.2;
-      position: relative;
-      z-index: 1;
-    }
-
-    .greeting-sub {
-      font-size: 13px;
-      color: var(--md-on-primary);
-      opacity: 0.75;
-      margin-top: 6px;
-      position: relative;
-      z-index: 1;
-    }
-
-    /* ── SECTION TITLE ── */
-    .section-title {
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--md-on-surface-variant);
-      letter-spacing: 0.4px;
-      text-transform: uppercase;
-      margin: 20px 0 10px;
-    }
-
-    /* ── CARD ── */
-    .card {
-      background: var(--md-surface);
-      border-radius: var(--md-radius-l);
-      padding: 20px;
-      margin-bottom: 12px;
-      box-shadow: var(--md-elevation-1);
+    textarea {
+      width: 100%;
+      height: 140px;
+      background: transparent;
       border: 1px solid var(--md-outline-variant);
-      transition: transform 0.15s, box-shadow 0.15s;
-      cursor: pointer;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .card:active {
-      transform: scale(0.98);
-      box-shadow: none;
-    }
-
-    .card-row {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .card-icon {
-      width: 48px;
-      height: 48px;
-      border-radius: var(--md-radius-m);
-      background: var(--md-primary-container);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 22px;
-      flex-shrink: 0;
-    }
-
-    .card-info { flex: 1; min-width: 0; }
-
-    .card-title {
+      border-radius: 16px;
+      padding: 16px;
+      color: var(--md-on-surface);
       font-size: 16px;
-      font-weight: 500;
-      color: var(--md-on-surface);
-      margin-bottom: 2px;
-    }
-
-    .card-desc {
-      font-size: 13px;
-      color: var(--md-on-surface-variant);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .card-arrow {
-      color: var(--md-on-surface-variant);
-      font-size: 18px;
-      opacity: 0.5;
-    }
-
-    /* ── TOOLS GRID ── */
-    .tools-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
+      resize: none;
       margin-bottom: 12px;
-    }
-
-    .tool-card {
-      background: var(--md-surface);
-      border-radius: var(--md-radius-l);
-      padding: 20px 16px;
-      border: 1px solid var(--md-outline-variant);
-      box-shadow: var(--md-elevation-1);
-      cursor: pointer;
-      transition: transform 0.15s, box-shadow 0.15s;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .tool-card:active {
-      transform: scale(0.96);
-      box-shadow: none;
-    }
-
-    .tool-icon {
-      width: 44px;
-      height: 44px;
-      border-radius: var(--md-radius-m);
-      background: var(--md-primary-container);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-    }
-
-    .tool-name {
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--md-on-surface);
-      line-height: 1.3;
-    }
-
-    .tool-desc {
-      font-size: 12px;
-      color: var(--md-on-surface-variant);
-      line-height: 1.4;
-    }
-
-    /* ── SETTINGS ── */
-    .settings-group {
-      background: var(--md-surface);
-      border-radius: var(--md-radius-l);
-      border: 1px solid var(--md-outline-variant);
-      overflow: hidden;
-      margin-bottom: 16px;
-      box-shadow: var(--md-elevation-1);
-    }
-
-    .settings-item {
-      display: flex;
-      align-items: center;
-      padding: 16px 20px;
-      gap: 16px;
-      cursor: pointer;
-      transition: background 0.15s;
-      border-bottom: 1px solid var(--md-outline-variant);
-    }
-
-    .settings-item:last-child { border-bottom: none; }
-    .settings-item:active { background: var(--md-surface-variant); }
-
-    .settings-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: var(--md-primary-container);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      flex-shrink: 0;
-    }
-
-    .settings-info { flex: 1; }
-
-    .settings-label {
-      font-size: 15px;
-      font-weight: 500;
-      color: var(--md-on-surface);
-    }
-
-    .settings-value {
-      font-size: 13px;
-      color: var(--md-on-surface-variant);
-      margin-top: 1px;
-    }
-
-    .settings-chevron {
-      color: var(--md-on-surface-variant);
-      opacity: 0.5;
-      font-size: 16px;
-    }
-
-    /* ── TOGGLE SWITCH ── */
-    .toggle {
-      width: 52px;
-      height: 30px;
-      border-radius: 15px;
-      background: var(--md-outline);
-      position: relative;
-      cursor: pointer;
-      transition: background 0.3s;
-      flex-shrink: 0;
-      border: none;
       outline: none;
     }
 
-    .toggle.on { background: var(--md-primary); }
+    .button-group { display: flex; gap: 8px; margin-bottom: 20px; }
+    .btn { flex: 1; padding: 16px; border-radius: 50px; border: none; font-weight: 700; cursor: pointer; transition: opacity 0.2s; }
+    .btn-primary { background: var(--md-primary); color: var(--md-on-primary); }
+    .btn-outline { background: transparent; border: 1px solid var(--md-outline-variant); color: var(--md-on-surface); }
+    .btn:active { opacity: 0.7; }
 
-    .toggle::after {
-      content: '';
-      position: absolute;
-      top: 3px; left: 3px;
-      width: 24px; height: 24px;
-      border-radius: 50%;
-      background: white;
-      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
-    }
-
-    .toggle.on::after { transform: translateX(22px); }
-
-    /* ── CHIP ── */
-    .chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 13px;
-      font-weight: 500;
-      background: var(--md-surface-variant);
-      color: var(--md-on-surface-variant);
-      border: 1px solid var(--md-outline-variant);
-      cursor: pointer;
-      transition: background 0.15s;
-    }
-
-    .chip.active {
-      background: var(--md-primary-container);
-      color: var(--md-on-primary-container);
-      border-color: var(--md-primary);
-    }
-
-    .chips-row {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-bottom: 16px;
-    }
-
-    /* ── BOTTOM NAV ── */
-    .bottom-nav {
-      position: fixed;
-      bottom: 0; left: 0; right: 0;
-      height: var(--md-nav-height);
-      background: var(--md-surface);
-      border-top: 1px solid var(--md-outline-variant);
-      display: flex;
-      align-items: center;
-      justify-content: space-around;
-      padding-bottom: env(safe-area-inset-bottom, 0px);
-      z-index: 100;
-      box-shadow: 0 -2px 12px var(--md-shadow);
-    }
-
-    .nav-item {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      padding: 8px 0;
-      cursor: pointer;
-      border: none;
-      background: transparent;
-      color: var(--md-on-surface-variant);
-      transition: color 0.2s;
-      position: relative;
-    }
-
-    .nav-item.active { color: var(--md-primary); }
-
-    .nav-indicator {
-      position: absolute;
-      top: 4px;
-      width: 64px; height: 32px;
+    .result-container {
+      display: none;
+      background: rgba(0,0,0,0.05);
       border-radius: 16px;
-      background: transparent;
-      transition: background 0.3s;
-    }
-
-    .nav-item.active .nav-indicator {
-      background: var(--md-primary-container);
-    }
-
-    .nav-icon {
-      font-size: 22px;
-      position: relative;
-      z-index: 1;
-      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-
-    .nav-item.active .nav-icon { transform: scale(1.1); }
-
-    .nav-label {
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 0.2px;
-    }
-
-    /* ── STAT CARDS ── */
-    .stats-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 12px;
-    }
-
-    .stat-card {
-      background: var(--md-surface);
-      border-radius: var(--md-radius-l);
       padding: 16px;
-      border: 1px solid var(--md-outline-variant);
-      box-shadow: var(--md-elevation-1);
+      border: 1px dashed var(--md-outline-variant);
+      position: relative;
     }
-
-    .stat-value {
-      font-family: 'Google Sans Display', sans-serif;
-      font-size: 28px;
-      font-weight: 700;
-      color: var(--md-primary);
-      line-height: 1;
-      margin-bottom: 4px;
-    }
-
-    .stat-label {
-      font-size: 12px;
-      color: var(--md-on-surface-variant);
-    }
-
-    /* ── VERSION BADGE ── */
-    .version-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--md-primary-container);
-      color: var(--md-on-primary-container);
+    .result-text { font-family: monospace; word-break: break-all; font-size: 14px; margin-top: 8px; }
+    .copy-toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #323232;
+      color: white;
+      padding: 10px 20px;
       border-radius: 20px;
-      padding: 6px 14px;
-      font-size: 13px;
-      font-weight: 500;
-      margin-bottom: 20px;
+      font-size: 12px;
+      display: none;
+      z-index: 1000;
     }
   </style>
 </head>
 <body>
+  <div class="app-header">
+    <div class="app-title">Odfiz Tool</div>
+    <p style="font-size: 12px; opacity: 0.6;">Satu fungsi, hasil instan.</p>
+  </div>
 
-  <!-- APP BAR -->
-  <div class="app-bar">
-    <span class="app-bar-title" id="pageTitle">Odfiz</span>
-    <div class="app-bar-actions">
-      <button class="icon-btn" onclick="alert('Notifikasi')">🔔</button>
-      <button class="icon-btn" onclick="alert('Profil')">👤</button>
+  <div class="main-card">
+    <textarea id="input" placeholder="Masukkan teks..."></textarea>
+    
+    <div class="button-group">
+      <button class="btn btn-outline" onclick="clearAll()">HAPUS</button>
+      <button class="btn btn-primary" onclick="process()">PROSES</button>
+    </div>
+    
+    <div id="resContainer" class="result-container" onclick="copyResult()">
+      <span style="font-size: 11px; font-weight: 700; color: var(--md-primary);">HASIL (Ketuk untuk salin):</span>
+      <div id="result" class="result-text"></div>
     </div>
   </div>
 
-  <!-- PAGES -->
-  <div class="pages">
-
-    <!-- HOME -->
-    <div class="page active" id="page-home">
-      <div class="greeting-card">
-        <div class="greeting-time" id="greetingTime">Selamat pagi</div>
-        <div class="greeting-text">Halo, Pengguna! 👋</div>
-        <div class="greeting-sub">Semua fitur siap digunakan</div>
-      </div>
-
-      <div class="stats-row">
-        <div class="stat-card">
-          <div class="stat-value">12</div>
-          <div class="stat-label">Tools tersedia</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value">0</div>
-          <div class="stat-label">Tugas selesai</div>
-        </div>
-      </div>
-
-      <div class="section-title">Fitur Utama</div>
-
-      <div class="card" onclick="navigate('tools')">
-        <div class="card-row">
-          <div class="card-icon">🛠️</div>
-          <div class="card-info">
-            <div class="card-title">Tools</div>
-            <div class="card-desc">Kumpulan alat bantu produktivitas</div>
-          </div>
-          <div class="card-arrow">›</div>
-        </div>
-      </div>
-
-      <div class="card" onclick="navigate('settings')">
-        <div class="card-row">
-          <div class="card-icon">⚙️</div>
-          <div class="card-info">
-            <div class="card-title">Pengaturan</div>
-            <div class="card-desc">Kustomisasi aplikasi sesuai kebutuhan</div>
-          </div>
-          <div class="card-arrow">›</div>
-        </div>
-      </div>
-
-      <div class="section-title">Aktivitas Terbaru</div>
-      <div class="card">
-        <div class="card-row">
-          <div class="card-icon">📋</div>
-          <div class="card-info">
-            <div class="card-title">Belum ada aktivitas</div>
-            <div class="card-desc">Mulai gunakan fitur untuk melihat riwayat</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- TOOLS -->
-    <div class="page" id="page-tools">
-      <div class="chips-row">
-        <div class="chip active">Semua</div>
-        <div class="chip">Utilitas</div>
-        <div class="chip">Keamanan</div>
-        <div class="chip">File</div>
-      </div>
-
-      <div class="tools-grid">
-        <div class="tool-card">
-          <div class="tool-icon">🔐</div>
-          <div>
-            <div class="tool-name">Enkripsi</div>
-            <div class="tool-desc">Enkripsi teks & file</div>
-          </div>
-        </div>
-        <div class="tool-card">
-          <div class="tool-icon">🔍</div>
-          <div>
-            <div class="tool-name">Hash File</div>
-            <div class="tool-desc">SHA256 & MD5</div>
-          </div>
-        </div>
-        <div class="tool-card">
-          <div class="tool-icon">📦</div>
-          <div>
-            <div class="tool-name">Kompresi</div>
-            <div class="tool-desc">Zip & unzip file</div>
-          </div>
-        </div>
-        <div class="tool-card">
-          <div class="tool-icon">🔑</div>
-          <div>
-            <div class="tool-name">Password</div>
-            <div class="tool-desc">Generate password kuat</div>
-          </div>
-        </div>
-        <div class="tool-card">
-          <div class="tool-icon">📊</div>
-          <div>
-            <div class="tool-name">Analisis</div>
-            <div class="tool-desc">Proses data CSV</div>
-          </div>
-        </div>
-        <div class="tool-card">
-          <div class="tool-icon">⏱️</div>
-          <div>
-            <div class="tool-name">Time Mark</div>
-            <div class="tool-desc">Catat timestamp</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- SETTINGS -->
-    <div class="page" id="page-settings">
-      <div class="version-badge">⚡ Odfiz App v0.1.0</div>
-
-      <div class="section-title">Tampilan</div>
-      <div class="settings-group">
-        <div class="settings-item">
-          <div class="settings-icon">🌙</div>
-          <div class="settings-info">
-            <div class="settings-label">Mode Gelap</div>
-            <div class="settings-value">Ikuti sistem</div>
-          </div>
-          <button class="toggle" id="darkToggle" onclick="this.classList.toggle('on')"></button>
-        </div>
-        <div class="settings-item">
-          <div class="settings-icon">🎨</div>
-          <div class="settings-info">
-            <div class="settings-label">Warna Tema</div>
-            <div class="settings-value">Biru (default)</div>
-          </div>
-          <span class="settings-chevron">›</span>
-        </div>
-        <div class="settings-item">
-          <div class="settings-icon">🔤</div>
-          <div class="settings-info">
-            <div class="settings-label">Ukuran Teks</div>
-            <div class="settings-value">Normal</div>
-          </div>
-          <span class="settings-chevron">›</span>
-        </div>
-      </div>
-
-      <div class="section-title">Aplikasi</div>
-      <div class="settings-group">
-        <div class="settings-item">
-          <div class="settings-icon">🔔</div>
-          <div class="settings-info">
-            <div class="settings-label">Notifikasi</div>
-            <div class="settings-value">Aktif</div>
-          </div>
-          <button class="toggle on" onclick="this.classList.toggle('on')"></button>
-        </div>
-        <div class="settings-item">
-          <div class="settings-icon">💾</div>
-          <div class="settings-info">
-            <div class="settings-label">Penyimpanan</div>
-            <div class="settings-value">Lokal (0 MB digunakan)</div>
-          </div>
-          <span class="settings-chevron">›</span>
-        </div>
-      </div>
-
-      <div class="section-title">Tentang</div>
-      <div class="settings-group">
-        <div class="settings-item">
-          <div class="settings-icon">ℹ️</div>
-          <div class="settings-info">
-            <div class="settings-label">Versi Aplikasi</div>
-            <div class="settings-value">0.1.0 (build 1)</div>
-          </div>
-        </div>
-        <div class="settings-item">
-          <div class="settings-icon">⚡</div>
-          <div class="settings-info">
-            <div class="settings-label">Dibuat dengan</div>
-            <div class="settings-value">Tauri + Rust + HTML</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- BOTTOM NAV -->
-  <nav class="bottom-nav">
-    <button class="nav-item active" id="nav-home" onclick="navigate('home')">
-      <div class="nav-indicator"></div>
-      <span class="nav-icon">🏠</span>
-      <span class="nav-label">Beranda</span>
-    </button>
-    <button class="nav-item" id="nav-tools" onclick="navigate('tools')">
-      <div class="nav-indicator"></div>
-      <span class="nav-icon">🛠️</span>
-      <span class="nav-label">Tools</span>
-    </button>
-    <button class="nav-item" id="nav-settings" onclick="navigate('settings')">
-      <div class="nav-indicator"></div>
-      <span class="nav-icon">⚙️</span>
-      <span class="nav-label">Setelan</span>
-    </button>
-  </nav>
+  <div id="toast" class="copy-toast">Tersalin ke clipboard!</div>
 
   <script>
-    const pages = ['home', 'tools', 'settings'];
-    const titles = { home: 'Odfiz', tools: 'Tools', settings: 'Setelan' };
+    function process() {
+      const val = document.getElementById('input').value;
+      if(!val) return;
+      
+      const res = btoa(val); // Logic: Base64
+      document.getElementById('result').textContent = res;
+      document.getElementById('resContainer').style.display = 'block';
+    }
 
-    function navigate(id) {
-      pages.forEach(p => {
-        document.getElementById('page-' + p).classList.remove('active');
-        document.getElementById('nav-' + p).classList.remove('active');
+    function clearAll() {
+      document.getElementById('input').value = '';
+      document.getElementById('resContainer').style.display = 'none';
+    }
+
+    function copyResult() {
+      const text = document.getElementById('result').textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        const toast = document.getElementById('toast');
+        toast.style.display = 'block';
+        setTimeout(() => toast.style.display = 'none', 2000);
       });
-      document.getElementById('page-' + id).classList.add('active');
-      document.getElementById('nav-' + id).classList.add('active');
-      document.getElementById('pageTitle').textContent = titles[id];
-      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-
-    function updateGreeting() {
-      const h = new Date().getHours();
-      const greet = h < 11 ? 'Selamat pagi ☀️'
-                  : h < 15 ? 'Selamat siang 🌤️'
-                  : h < 18 ? 'Selamat sore 🌅'
-                  : 'Selamat malam 🌙';
-      document.getElementById('greetingTime').textContent = greet;
-    }
-
-    updateGreeting();
   </script>
 </body>
 </html>
-

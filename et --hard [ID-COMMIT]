@@ -1,0 +1,35 @@
+[33m5c5f0e5[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Fix: Install tauri cli globally to avoid npx issues
+[33m60cca03[m Fix: use full tauri cli package name
+[33m5d57700[m Fix icon generation order
+[33m3697982[m Update workflow dan fix icon
+[33m5ea6ed7[m fix: fix JSON syntax in tauri.conf.json
+[33me079a65[m fix: fix JSON syntax in tauri.conf.json
+[33m93d5da4[m fix: remove invalid android signing config
+[33me3b5add[m initial commit
+[33m78491b5[m feat: Material You edIt
+[33m52f6314[m feat: Material You UI
+[33m2bc9726[m fix: generate keystore in CI
+[33mae068c3[m fix: manual apksigner
+[33mcf6cc8c[m fix: add APK signing
+[33m3c2042b[m fix: build release aarch64 only
+[33mca7bb3b[m fix: build debug APK
+[33m6f5c42b[m fix: generate RGBA icon
+[33m8e9fb09[m fix: add tauri android init step
+[33m9f2956d[m fix: generate icon in CI
+[33mc419503[m fix: add app icon
+[33m58b0e9f[m fix: move frontend to src folder
+[33md0236a0[m fix: update upload-artifact to v4
+[33mf360ed4[m fix: remove node_modules and add gitignore
+[33m5620815[m fix: remove old workflow
+[33mda6ad49[m fix: remove tauri-plugin-shell
+[33m294a7a2[m fix: remove rustls feature
+[33mf6c10e9[m setup tauri project
+[33m8ab69d2[m Final Fix: Bypass OpenSSL with rustls
+[33mfcff9e9[m Fix: Switch to rustls to bypass OpenSSL error
+[33m3b501f0[m Fix: Reset workflow and folder structure
+[33m041811e[m Add workflow for building Android APK
+[33m67b605d[m Fix: Add Android NDK and cargo-ndk for compilation
+[33m3a18653[m Fix: Force system OpenSSL with env vars
+[33m336dade[m Fix: Add OpenSSL and pkg-config dependencies
+[33m1671ca0[m Tambah instruksi build APK otomatis
+[33m77403bb[m Initial commit struktur Tauri dari Android
