@@ -20,6 +20,29 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
+      # --- FITUR CACHE MULAI DI SINI ---
+      - name: Cache Rust Dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            src-tauri/target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      - name: Cache Node Modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      # --- FITUR CACHE SELESAI ---
+
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
         with:
@@ -29,25 +52,23 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'
-          cache: 'npm'
 
       - name: Install Dependencies
         run: npm install
 
-      - name: Build Android APK (Debug Mode)
-        # Menghapus --release agar otomatis ditandatangani dengan debug key
+      - name: Build Android APK
         run: |
-          rm -rf src-tauri/gen
+          # Jangan hapus gen jika ingin cache lebih maksimal, 
+          # tapi tauri android init tetap butuh folder bersih kadang-kadang.
           npx tauri android init
           npx tauri android build --debug --apk --target aarch64
         env:
           NDK_HOME: ${{ env.ANDROID_NDK_HOME }}
 
-      - name: Find and Upload APK
+      - name: Find and Move APK
         run: |
           mkdir -p outputs
           find src-tauri/gen/android -name "*-debug.apk" -exec cp {} outputs/ \;
-          ls -R outputs
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
