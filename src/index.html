@@ -2,65 +2,54 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Odfiz Tool</title>
-  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Odfiz Zip File</title>
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;700&display=swap" rel="stylesheet" />
   <style>
-    :root {
-      --md-primary: #006495;
-      --md-on-primary: #ffffff;
-      --md-surface: #f5fafd;
-      --md-on-surface: #171c1f;
-      --md-outline-variant: #c1c7ce;
-      --md-radius-xl: 28px;
-    }
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --md-primary: #90ceff; --md-on-primary: #00344f;
-        --md-surface: #0f1416; --md-on-surface: #dde3e9;
-      }
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Google Sans', sans-serif; }
-    body { background: var(--md-surface); color: var(--md-on-surface); padding: 20px; }
-    .app-header { margin-bottom: 24px; text-align: center; padding-top: 20px; }
-    .app-title { font-size: 24px; font-weight: 700; color: var(--md-primary); }
-    .main-card { background: var(--md-surface); border: 1px solid var(--md-outline-variant); border-radius: var(--md-radius-xl); padding: 24px; }
-    textarea { width: 100%; height: 140px; background: transparent; border: 1px solid var(--md-outline-variant); border-radius: 16px; padding: 16px; color: var(--md-on-surface); margin-bottom: 12px; outline: none; }
-    .btn-primary { width: 100%; padding: 18px; border-radius: 50px; border: none; background: var(--md-primary); color: var(--md-on-primary); font-weight: 700; cursor: pointer; }
-    .result-container { display: none; margin-top: 20px; padding: 16px; background: rgba(0,0,0,0.05); border-radius: 16px; border: 1px dashed var(--md-outline-variant); }
+    :root { --md-primary: #006495; --md-surface: #f5fafd; }
+    body { font-family: 'Google Sans', sans-serif; background: var(--md-surface); padding: 20px; text-align: center; }
+    .card { background: white; border-radius: 28px; padding: 30px; border: 1px solid #c1c7ce; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    .icon-large { font-size: 64px; margin-bottom: 20px; }
+    input[type="file"] { margin: 20px 0; width: 100%; }
+    button { width: 100%; padding: 18px; border-radius: 50px; border: none; background: var(--md-primary); color: white; font-weight: 700; cursor: pointer; font-size: 16px; }
+    #status { margin-top: 20px; font-size: 14px; color: #444; word-break: break-all; }
   </style>
 </head>
 <body>
-  <div class="app-header">
-    <div class="app-title">Odfiz x Rust</div>
-    <p style="font-size: 12px; opacity: 0.6;">Ditenagai Mesin Rust</p>
-  </div>
+  <div class="icon-large">📦</div>
+  <h2 style="margin-bottom:10px;">Odfiz Professional Zip</h2>
+  <p style="font-size:13px; opacity:0.7; margin-bottom:25px;">Pilih file apa saja untuk dikompres oleh Rust</p>
 
-  <div class="main-card">
-    <textarea id="input" placeholder="Ketik pesan untuk dikirim ke Rust..."></textarea>
-    <button class="btn-primary" onclick="panggilRust()">KIRIM KE MESIN RUST</button>
-    
-    <div id="resContainer" class="result-container">
-      <span style="font-size: 11px; font-weight: 700; color: var(--md-primary);">HASIL DARI RUST:</span>
-      <div id="result" style="font-family: monospace; word-break: break-all; margin-top: 8px;"></div>
-    </div>
+  <div class="card">
+    <input type="file" id="filePicker">
+    <button onclick="startCompression()">MULAI KOMPRESI</button>
+    <div id="status">Siap memproses...</div>
   </div>
 
   <script>
     const { invoke } = window.__TAURI__.core;
+    
+    async function startCompression() {
+      const picker = document.getElementById('filePicker');
+      const status = document.getElementById('status');
+      
+      if (picker.files.length === 0) {
+        status.innerText = "❌ Pilih file dulu!";
+        return;
+      }
 
-    async function panggilRust() {
-      const val = document.getElementById('input').value;
-      if(!val) return;
+      // Catatan: Pada Tauri mobile, kita butuh akses path asli.
+      // Untuk simulasi sederhana, kita kirim nama filenya.
+      const file = picker.files[0];
+      status.innerText = "⚡ Mesin Rust sedang bekerja...";
       
       try {
-        // JavaScript memanggil fungsi 'proses_ke_rust' yang ada di lib.rs
-        const hasil = await invoke('proses_ke_rust', { input: val });
-        
-        document.getElementById('result').textContent = hasil;
-        document.getElementById('resContainer').style.display = 'block';
+        // Kita asumsikan file diakses via path (memerlukan plugin fs)
+        // Untuk demo ini, kita kirim info file
+        const res = await invoke('kompres_file_asli', { inputPath: file.name });
+        status.innerText = res;
       } catch (e) {
-        console.error(e);
+        status.innerText = "Error: " + e;
       }
     }
   </script>
