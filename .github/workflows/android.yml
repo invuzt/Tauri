@@ -34,18 +34,20 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      - name: Clean and Init Android
+      - name: Build Android APK
+        # Menambahkan flag --apk secara eksplisit
         run: |
           rm -rf src-tauri/gen
           npx tauri android init
-
-      - name: Build Android APK
-        run: npx tauri android build --apk --target aarch64
+          npx tauri android build --apk --target aarch64
         env:
           NDK_HOME: ${{ env.ANDROID_NDK_HOME }}
 
-      - name: Upload APK
+      - name: Find and Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: odfiz-tool-debug-apk
-          path: src-tauri/gen/android/app/build/outputs/apk/debug/*.apk
+          # Menggunakan pola pencarian yang lebih luas agar tidak meleset
+          path: |
+            src-tauri/gen/android/app/build/outputs/apk/debug/*.apk
+            src-tauri/gen/android/app/build/outputs/apk/release/*.apk
