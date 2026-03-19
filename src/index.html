@@ -3,53 +3,56 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Odfiz Zip File</title>
+  <title>Odfiz Zip Pro</title>
   <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;700&display=swap" rel="stylesheet" />
   <style>
     :root { --md-primary: #006495; --md-surface: #f5fafd; }
     body { font-family: 'Google Sans', sans-serif; background: var(--md-surface); padding: 20px; text-align: center; }
-    .card { background: white; border-radius: 28px; padding: 30px; border: 1px solid #c1c7ce; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-    .icon-large { font-size: 64px; margin-bottom: 20px; }
-    input[type="file"] { margin: 20px 0; width: 100%; }
-    button { width: 100%; padding: 18px; border-radius: 50px; border: none; background: var(--md-primary); color: white; font-weight: 700; cursor: pointer; font-size: 16px; }
-    #status { margin-top: 20px; font-size: 14px; color: #444; word-break: break-all; }
+    .card { background: white; border-radius: 28px; padding: 30px; border: 1px solid #c1c7ce; }
+    button { width: 100%; padding: 18px; border-radius: 50px; border: none; background: var(--md-primary); color: white; font-weight: 700; margin-top: 10px; }
+    #status { margin-top: 20px; font-size: 13px; color: #555; word-break: break-all; }
   </style>
 </head>
 <body>
-  <div class="icon-large">📦</div>
-  <h2 style="margin-bottom:10px;">Odfiz Professional Zip</h2>
-  <p style="font-size:13px; opacity:0.7; margin-bottom:25px;">Pilih file apa saja untuk dikompres oleh Rust</p>
-
+  <div style="font-size: 50px;">📦</div>
+  <h2>Odfiz Professional Zip</h2>
   <div class="card">
-    <input type="file" id="filePicker">
-    <button onclick="startCompression()">MULAI KOMPRESI</button>
-    <div id="status">Siap memproses...</div>
+    <p id="pathDisplay">Belum ada file dipilih</p>
+    <button onclick="pilihFile()">PILIH FILE</button>
+    <button id="btnKompres" onclick="mulaiKompres()" style="display:none; background:#004a6f;">MULAI KOMPRESI</button>
+    <div id="status"></div>
   </div>
 
   <script>
     const { invoke } = window.__TAURI__.core;
-    
-    async function startCompression() {
-      const picker = document.getElementById('filePicker');
-      const status = document.getElementById('status');
-      
-      if (picker.files.length === 0) {
-        status.innerText = "❌ Pilih file dulu!";
-        return;
-      }
+    const { open } = window.__TAURI__.dialog;
+    let selectedPath = null;
 
-      // Catatan: Pada Tauri mobile, kita butuh akses path asli.
-      // Untuk simulasi sederhana, kita kirim nama filenya.
-      const file = picker.files[0];
-      status.innerText = "⚡ Mesin Rust sedang bekerja...";
-      
+    async function pilihFile() {
       try {
-        // Kita asumsikan file diakses via path (memerlukan plugin fs)
-        // Untuk demo ini, kita kirim info file
-        const res = await invoke('kompres_file_asli', { inputPath: file.name });
-        status.innerText = res;
+        // Membuka file picker asli Android via Tauri
+        const selected = await open({
+          multiple: false,
+          directory: false,
+        });
+        if (selected) {
+          selectedPath = selected;
+          document.getElementById('pathDisplay').innerText = "Target: " + selected;
+          document.getElementById('btnKompres').style.display = 'block';
+        }
       } catch (e) {
-        status.innerText = "Error: " + e;
+        alert("Gagal membuka file picker: " + e);
+      }
+    }
+
+    async function mulaiKompres() {
+      const status = document.getElementById('status');
+      status.innerText = "⚡ Mesin Rust sedang bekerja...";
+      try {
+        const res = await invoke('kompres_file_asli', { inputPath: selectedPath });
+        status.innerText = "✅ " + res;
+      } catch (e) {
+        status.innerText = "❌ Error: " + e;
       }
     }
   </script>
