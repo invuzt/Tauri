@@ -21,7 +21,7 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: Install Rust
-        uses: dtolnay/rust-toolcache@stable
+        uses: dtolnay/rust-toolchain@stable
         with:
           targets: aarch64-linux-android
 
@@ -35,7 +35,6 @@ jobs:
         run: npm install
 
       - name: Clean and Init Android
-        # Ini kunci perbaikannya: Hapus gen lama agar identifier baru bisa diterapkan
         run: |
           rm -rf src-tauri/gen
           npx tauri android init
