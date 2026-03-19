@@ -10,7 +10,6 @@ async fn kompres_file_asli(input_path: String) -> Result<String, String> {
         return Err("File tidak ditemukan!".into());
     }
 
-    // Nama file hasil zip
     let output_path = format!("{}.zip", input_path);
     let zip_file = File::create(&output_path).map_err(|e| e.to_string())?;
     let mut zip = zip::ZipWriter::new(zip_file);
@@ -19,9 +18,9 @@ async fn kompres_file_asli(input_path: String) -> Result<String, String> {
         .compression_method(zip::CompressionMethod::Deflated)
         .unix_permissions(0o755);
 
-    // Ambil nama file saja dari path lengkap
+    // Perbaikan di sini: ditambahkan .into() untuk konversi tipe data
     let file_name = path.file_name()
-        .and_then(|n| n.to_string_lossy().into())
+        .map(|n| n.to_string_lossy().into_owned())
         .unwrap_or_else(|| "file".to_string());
 
     zip.start_file(file_name, options).map_err(|e| e.to_string())?;
