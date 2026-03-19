@@ -1,4 +1,4 @@
-name: Build Android APK (Optimized)
+name: Build Android APK (Auto-Fix)
 on:
   push:
     branches: [ main ]
@@ -20,7 +20,6 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      # --- OPTIMASI 1: CACHE RUST & CARGO ---
       - name: Cache Rust
         uses: actions/cache@v4
         with:
@@ -33,7 +32,6 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-
 
-      # --- OPTIMASI 2: CACHE NODE MODULES ---
       - name: Cache Node.js modules
         uses: actions/cache@v4
         with:
@@ -51,21 +49,27 @@ jobs:
 
       - name: Build Android APK
         run: |
-          # Cek apakah folder gen sudah ada dari cache
+          # Logika pengecekan folder Java agar tidak error Identifier Mismatch
+          if [ -d "src-tauri/gen/android" ]; then
+            echo "Memeriksa integritas folder project..."
+            if [ ! -d "src-tauri/gen/android/app/src/main/java/com/odfiz/tool" ]; then
+              echo "Identifier tidak cocok dengan cache! Menghapus folder gen..."
+              rm -rf src-tauri/gen
+            fi
+          fi
+
           if [ ! -d "src-tauri/gen/android" ]; then
-            echo "Inisialisasi Android Project baru..."
+            echo "Inisialisasi ulang Android Project..."
             npx tauri android init
           fi
 
-          # OPTIMASI 3: AUTO INJECT PERMISSIONS (Anti Ribet)
+          # Tambahkan izin Storage otomatis
           MANIFES="src-tauri/gen/android/app/src/main/AndroidManifest.xml"
           if [ -f "$MANIFES" ]; then
-            echo "Menambahkan izin Storage ke Manifest..."
-            # Menambah izin sebelum tag <application
+            echo "Menyuntikkan izin Storage..."
             sed -i '/<application/i \    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>\n    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>\n    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>' $MANIFES
           fi
 
-          # Build khusus arsitektur HP kamu biar cepat
           npx tauri android build --debug --apk --target aarch64
         env:
           NDK_HOME: ${{ env.ANDROID_NDK_HOME }}
@@ -78,5 +82,5 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: odfiz-tool-optimized
+          name: odfiz-tool-final
           path: outputs/*.apk
