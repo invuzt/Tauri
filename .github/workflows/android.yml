@@ -35,7 +35,6 @@ jobs:
         run: npm install
 
       - name: Build Android APK
-        # Menambahkan flag --apk secara eksplisit
         run: |
           rm -rf src-tauri/gen
           npx tauri android init
@@ -43,11 +42,16 @@ jobs:
         env:
           NDK_HOME: ${{ env.ANDROID_NDK_HOME }}
 
-      - name: Find and Upload APK
+      - name: Find APK and Move to Root
+        # Perintah ini akan mencari semua file .apk dan mengumpulkannya di folder 'outputs'
+        run: |
+          mkdir -p outputs
+          find src-tauri/gen/android -name "*.apk" -exec cp {} outputs/ \;
+          echo "Daftar file di folder outputs:"
+          ls -R outputs
+
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: odfiz-tool-debug-apk
-          # Menggunakan pola pencarian yang lebih luas agar tidak meleset
-          path: |
-            src-tauri/gen/android/app/build/outputs/apk/debug/*.apk
-            src-tauri/gen/android/app/build/outputs/apk/release/*.apk
+          name: odfiz-tool-apk
+          path: outputs/*.apk
