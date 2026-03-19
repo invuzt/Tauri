@@ -34,24 +34,23 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      - name: Build Android APK
+      - name: Build Android APK (Debug Mode)
+        # Menghapus --release agar otomatis ditandatangani dengan debug key
         run: |
           rm -rf src-tauri/gen
           npx tauri android init
-          npx tauri android build --apk --target aarch64
+          npx tauri android build --debug --apk --target aarch64
         env:
           NDK_HOME: ${{ env.ANDROID_NDK_HOME }}
 
-      - name: Find APK and Move to Root
-        # Perintah ini akan mencari semua file .apk dan mengumpulkannya di folder 'outputs'
+      - name: Find and Upload APK
         run: |
           mkdir -p outputs
-          find src-tauri/gen/android -name "*.apk" -exec cp {} outputs/ \;
-          echo "Daftar file di folder outputs:"
+          find src-tauri/gen/android -name "*-debug.apk" -exec cp {} outputs/ \;
           ls -R outputs
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: odfiz-tool-apk
+          name: odfiz-tool-debug
           path: outputs/*.apk
