@@ -20,3 +20,12 @@ walkdir = "2.3"
 
 [build-dependencies]
 tauri-build = { version = "2.0", features = [] }
+
+# ─── Profile untuk APK sekecil mungkin ───────────────────────────────────────
+[profile.release]
+opt-level     = "z"   # Optimalkan ukuran (bukan kecepatan)
+lto           = true  # Link-Time Optimization → buang kode tidak terpakai
+codegen-units = 1     # Satu unit → kompresi lebih baik
+panic         = "abort"  # Hapus panic unwinding overhead
+strip         = true  # Hapus debug symbols dari binary
+
