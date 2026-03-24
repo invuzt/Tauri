@@ -1,38 +1,29 @@
-[package]
-name = "cakru"
-version = "0.1.0"
-description = "Odfiz Zip Tool"
-authors = ["Odfiz"]
-edition = "2021"
+ [package]
+ name = "cakru"
+ version = "0.1.0"
+ description = "Odfiz Zip Tool"
+ authors = ["Odfiz"]
+ edition = "2021"
 
-[lib]
-name = "odfiz_app_lib"
-crate-type = ["lib", "cdylib", "staticlib"]
+ [lib]
+ name = "odfiz_app_lib"
+ crate-type = ["lib", "cdylib", "staticlib"]
 
-[dependencies]
-tauri = { version = "2.0", features = [] }
-tauri-plugin-fs = "2.0"
-tauri-plugin-dialog = "2.0"
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
-zip = "0.6"
-walkdir = "2.3"
+ [dependencies]
+ tauri = { version = "2.0", features = [] }
+ tauri-plugin-fs = "2.0"
+ tauri-plugin-dialog = "2.0"
+ serde = { version = "1.0", features = ["derive"] }
+ serde_json = "1.0"
+ zip = "0.6"
+ walkdir = "2.3"
 
-[build-dependencies]
-tauri-build = { version = "2.0", features = [] }
+ [build-dependencies]
+ tauri-build = { version = "2.0", features = [] }
 
-# ─── Profile untuk APK sekecil mungkin ───────────────────────────────────────
-[profile.release]
-opt-level     = "z"   # Optimalkan ukuran (bukan kecepatan)
-lto           = true  # Link-Time Optimization → buang kode tidak terpakai
-codegen-units = 1     # Satu unit → kompresi lebih baik
-panic         = "abort"  # Hapus panic unwinding overhead
-strip         = true  # Hapus debug symbols dari binary
-
-
-[profile.release]
-opt-level     = "z"
-lto           = true
-codegen-units = 1
-panic         = "abort"
-strip         = true
+ [profile.release]
+ opt-level     = "z"
+ lto           = true
+ codegen-units = 1
+ panic         = "abort"
+ strip         = true
