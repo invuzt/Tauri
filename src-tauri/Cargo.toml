@@ -29,3 +29,10 @@ codegen-units = 1     # Satu unit → kompresi lebih baik
 panic         = "abort"  # Hapus panic unwinding overhead
 strip         = true  # Hapus debug symbols dari binary
 
+
+[profile.release]
+opt-level     = "z"
+lto           = true
+codegen-units = 1
+panic         = "abort"
+strip         = true
